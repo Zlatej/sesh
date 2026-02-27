@@ -1,6 +1,7 @@
 use std::process;
 
 mod config;
+mod scanner;
 
 fn main() {
     let cfg = match config::load() {
