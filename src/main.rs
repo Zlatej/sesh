@@ -3,6 +3,7 @@ use std::process;
 mod cache;
 mod config;
 mod scanner;
+mod utils;
 
 fn main() {
     let cfg = match config::load() {
