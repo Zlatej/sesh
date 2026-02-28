@@ -1,5 +1,6 @@
 use std::process;
 
+mod cache;
 mod config;
 mod scanner;
 

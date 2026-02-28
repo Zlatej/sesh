@@ -1,0 +1,68 @@
+use std::{collections::HashMap, error::Error, fs};
+
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Deserialize)]
+struct ProjectsFile {
+    projects: HashMap<String, String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Cache {
+    projects: HashMap<String, String>,
+    #[serde(skip)]
+    dirty: bool,
+}
+
+impl Cache {
+    pub fn load() -> Result<Self, Box<dyn Error>> {
+        let mut path = dirs::config_dir().ok_or("OS config dir not found")?;
+        path.push("sesh");
+        fs::create_dir_all(&path)?;
+        path.push("projects.toml");
+        if !path.exists() {
+            fs::write(&path, "[projects]\n")?;
+        }
+        let content = fs::read_to_string(path)?;
+        let file: ProjectsFile = toml::from_str(&content)?;
+        Ok(Cache {
+            projects: file.projects,
+            dirty: false,
+        })
+    }
+
+    pub fn save(&mut self) -> Result<(), Box<dyn Error>> {
+        if !self.dirty {
+            return Ok(());
+        }
+        let mut path = dirs::config_dir().ok_or("OS config dir not found")?;
+        path.push("sesh");
+        fs::create_dir_all(&path)?;
+        path.push("projects.toml");
+        if !path.exists() {
+            fs::write(&path, "[projects]\n")?;
+        }
+        let content = toml::to_string_pretty(self)?;
+        fs::write(&path, content)?;
+        self.dirty = false;
+
+        Ok(())
+    }
+
+    pub fn get_preset(&mut self, project: &str) -> Option<&str> {
+        self.projects.get(project).map(|x| x.as_str())
+    }
+
+    pub fn set_preset(&mut self, project: String, preset: String) {
+        self.projects.insert(project, preset);
+        self.dirty = true;
+    }
+
+    pub fn remove_project(&mut self, project: &str) -> bool {
+        let removed = self.projects.remove(project).is_some();
+        if removed {
+            self.dirty = true;
+        }
+        removed
+    }
+}
