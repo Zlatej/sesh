@@ -10,6 +10,12 @@ pub struct Cfg {
     pub presets: Option<HashMap<String, Preset>>,
 }
 
+impl Cfg {
+    pub fn get_preset(&self, name: &str) -> Option<&Preset> {
+        self.presets.as_ref()?.get(name)
+    }
+}
+
 #[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct Preset {
