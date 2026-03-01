@@ -1,9 +1,6 @@
-use std::{
-    error::Error,
-    path::{Path, PathBuf},
-};
+use std::{error::Error, path::{Path, PathBuf}};
 
-use crate::utils::to_tilde_path;
+use crate::utils::{expand_tilde, to_tilde_path};
 
 #[derive(Debug, Ord, Eq, PartialEq, PartialOrd)]
 pub struct ProjectPath {
@@ -13,6 +10,16 @@ pub struct ProjectPath {
 }
 
 impl ProjectPath {
+    pub fn from_relative(path: &str) -> Result<Self, Box<dyn Error>> {
+        let real = expand_tilde(path)?;
+        let sesh_name = last_component(&real)?;
+        Ok(Self {
+            tilde: path.to_string(),
+            real,
+            sesh_name,
+        })
+    }
+
     pub fn from_path(path: PathBuf) -> Result<Self, Box<dyn Error>> {
         let tilde = to_tilde_path(&path)?;
         let sesh_name = last_component(&path)?;

@@ -6,6 +6,7 @@ use crate::utils::get_config_file_path;
 #[derive(Debug, Deserialize)]
 pub struct Cfg {
     pub workspaces: Vec<String>,
+    pub bookmarks: Vec<String>,
     pub presets: Option<HashMap<String, Preset>>,
 }
 

@@ -37,7 +37,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 fn launch_project() -> Result<(), Box<dyn Error>> {
     let cfg = config::load()?;
     let mut cache = Cache::load()?;
-    let projects = scanner::scan(&cfg.workspaces)?;
+    let projects = scanner::scan(&cfg)?;
     let Some(project) = ui::pick_project(&projects)? else {
         return Ok(());
     };
