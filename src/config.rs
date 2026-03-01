@@ -1,6 +1,8 @@
 use serde::Deserialize;
 use std::{collections::HashMap, error::Error, fs};
 
+use crate::utils::get_config_file_path;
+
 #[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct Cfg {
@@ -22,10 +24,7 @@ pub struct Window {
 }
 
 pub fn load() -> Result<Cfg, Box<dyn Error>> {
-    let mut path = dirs::config_dir().ok_or("OS config dir not found")?;
-    path.push("sesh");
-    fs::create_dir_all(&path)?;
-    path.push("config.toml");
+    let path = get_config_file_path("config.toml")?;
     if !path.exists() {
         fs::write(&path, "workspaces = []")?;
     }

@@ -2,6 +2,8 @@ use std::{collections::HashMap, error::Error, fs};
 
 use serde::{Deserialize, Serialize};
 
+use crate::utils::get_config_file_path;
+
 #[derive(Debug, Deserialize)]
 struct ProjectsFile {
     projects: HashMap<String, String>,
@@ -22,10 +24,7 @@ impl Drop for Cache {
 
 impl Cache {
     pub fn load() -> Result<Self, Box<dyn Error>> {
-        let mut path = dirs::config_dir().ok_or("OS config dir not found")?;
-        path.push("sesh");
-        fs::create_dir_all(&path)?;
-        path.push("projects.toml");
+        let path = get_config_file_path("projects.toml")?;
         if !path.exists() {
             fs::write(&path, "[projects]\n")?;
         }
@@ -41,10 +40,7 @@ impl Cache {
         if !self.dirty {
             return Ok(());
         }
-        let mut path = dirs::config_dir().ok_or("OS config dir not found")?;
-        path.push("sesh");
-        fs::create_dir_all(&path)?;
-        path.push("projects.toml");
+        let path = get_config_file_path("projects.toml")?;
         if !path.exists() {
             fs::write(&path, "[projects]\n")?;
         }
