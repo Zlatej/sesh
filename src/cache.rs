@@ -14,6 +14,12 @@ pub struct Cache {
     dirty: bool,
 }
 
+impl Drop for Cache {
+    fn drop(&mut self) {
+        let _ = self.save();
+    }
+}
+
 impl Cache {
     pub fn load() -> Result<Self, Box<dyn Error>> {
         let mut path = dirs::config_dir().ok_or("OS config dir not found")?;
