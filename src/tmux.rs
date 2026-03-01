@@ -1,11 +1,10 @@
-use std::{
-    error::Error,
-    os::unix::process::CommandExt,
-    process::{self, Command},
-};
+use std::{error::Error, os::unix::process::CommandExt, process::Command};
 
 use crate::config::Preset;
 
+/// launch prepares tmux session and then attaches with exec.
+/// This function will never return or return error, it basically "exits" to tmux, meaning no
+/// destructors will be called.
 pub fn launch(project: &str, preset: &Preset) -> Result<(), Box<dyn Error>> {
     let sesh_name = project.split("/").last().ok_or("failed to split string")?;
     let exists = Command::new("tmux")
