@@ -3,6 +3,7 @@ use std::process;
 mod cache;
 mod config;
 mod scanner;
+mod tmux;
 mod utils;
 
 fn main() {
