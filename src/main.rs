@@ -7,6 +7,7 @@ use crate::{cache::Cache, tmux::launch};
 
 mod cache;
 mod config;
+mod path;
 mod scanner;
 mod tmux;
 mod ui;
@@ -40,7 +41,7 @@ fn launch_project() -> Result<(), Box<dyn Error>> {
     let Some(project) = ui::pick_project(&projects)? else {
         return Ok(());
     };
-    let preset_name = match cache.get_preset(&project) {
+    let preset_name = match cache.get_preset(&project.tilde) {
         Some(name) => name.to_owned(),
         None => {
             let names = cfg
@@ -51,12 +52,12 @@ fn launch_project() -> Result<(), Box<dyn Error>> {
             let Some(picked) = ui::pick_preset(&names)? else {
                 return Ok(());
             };
-            cache.set_preset(project.clone(), picked.clone());
+            cache.set_preset(project.tilde.clone(), picked.clone());
             picked
         }
     };
     let preset = cfg.get_preset(&preset_name).ok_or("preset not found")?;
     cache.save()?;
-    launch(&project, preset)?;
+    launch(project, preset)?;
     Ok(())
 }

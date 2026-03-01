@@ -1,8 +1,11 @@
 use std::{error::Error, fs};
 
-use crate::utils::{self, to_tilde_path};
+use crate::{
+    path::ProjectPath,
+    utils::{self},
+};
 
-pub fn scan(workspaces: &[String]) -> Result<Vec<String>, Box<dyn Error>> {
+pub fn scan(workspaces: &[String]) -> Result<Vec<ProjectPath>, Box<dyn Error>> {
     let mut projects = Vec::new();
 
     for ws in workspaces {
@@ -16,7 +19,7 @@ pub fn scan(workspaces: &[String]) -> Result<Vec<String>, Box<dyn Error>> {
                 continue;
             }
 
-            projects.push(to_tilde_path(&path)?);
+            projects.push(ProjectPath::from_path(path)?);
         }
     }
 

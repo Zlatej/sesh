@@ -3,7 +3,6 @@ use std::{collections::HashMap, error::Error, fs};
 
 use crate::utils::get_config_file_path;
 
-#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct Cfg {
     pub workspaces: Vec<String>,
@@ -16,13 +15,11 @@ impl Cfg {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct Preset {
     pub windows: Vec<Window>,
 }
 
-#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct Window {
     pub name: Option<String>,

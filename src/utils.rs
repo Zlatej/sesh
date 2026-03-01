@@ -33,10 +33,3 @@ pub fn get_config_file_path(filename: &str) -> Result<PathBuf, Box<dyn Error>> {
     path.push(filename);
     Ok(path)
 }
-
-pub fn get_project_name(path: &str) -> Result<&str, Box<dyn Error>> {
-    path.split('/')
-        .next_back()
-        .filter(|s| !s.is_empty())
-        .ok_or_else(|| "Failed to extract project name from path".into())
-}

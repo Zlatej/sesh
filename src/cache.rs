@@ -60,6 +60,7 @@ impl Cache {
         self.dirty = true;
     }
 
+    #[allow(dead_code)]
     pub fn remove_project(&mut self, project: &str) -> bool {
         let removed = self.projects.remove(project).is_some();
         if removed {
