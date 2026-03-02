@@ -1,4 +1,7 @@
-use std::{error::Error, path::{Path, PathBuf}};
+use std::{
+    error::Error,
+    path::{Path, PathBuf},
+};
 
 use crate::utils::{expand_tilde, to_tilde_path};
 
@@ -12,7 +15,7 @@ pub struct ProjectPath {
 impl ProjectPath {
     pub fn from_relative(path: &str) -> Result<Self, Box<dyn Error>> {
         let real = expand_tilde(path)?;
-        let sesh_name = last_component(&real)?;
+        let sesh_name = tmuxize_name(&real)?;
         Ok(Self {
             tilde: path.to_string(),
             real,
@@ -22,13 +25,17 @@ impl ProjectPath {
 
     pub fn from_path(path: PathBuf) -> Result<Self, Box<dyn Error>> {
         let tilde = to_tilde_path(&path)?;
-        let sesh_name = last_component(&path)?;
+        let sesh_name = tmuxize_name(&path)?;
         Ok(Self {
             tilde,
             real: path,
             sesh_name,
         })
     }
+}
+
+fn tmuxize_name(path: &Path) -> Result<String, Box<dyn Error>> {
+    Ok(last_component(path)?.replace(".", "_"))
 }
 
 fn last_component(path: &Path) -> Result<String, Box<dyn Error>> {
