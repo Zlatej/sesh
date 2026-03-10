@@ -5,7 +5,7 @@ use crate::{config::Preset, path::ProjectPath};
 /// launch prepares tmux session and then attaches with exec.
 /// This function will never return or return error, it basically "exits" to tmux, meaning no
 /// destructors will be called.
-pub fn launch(project: &ProjectPath, preset: &Preset) -> Result<(), Box<dyn Error>> {
+pub fn launch(project: &ProjectPath, preset: Option<&Preset>) -> Result<(), Box<dyn Error>> {
     let exists = Command::new("tmux")
         .args(["has-session", "-t", &project.sesh_name])
         .output()
@@ -21,7 +21,9 @@ pub fn launch(project: &ProjectPath, preset: &Preset) -> Result<(), Box<dyn Erro
             "-c",
             &project.real.display().to_string(),
         ])?;
-        setup_windows(project, preset)?;
+        if let Some(p) = preset {
+            setup_windows(project, p)?;
+        }
         run_tmux_cmd(&["select-window", "-t", &format!("{}:^", project.sesh_name)])?;
     }
 
