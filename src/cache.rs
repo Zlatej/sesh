@@ -26,10 +26,15 @@ impl Cache {
     pub fn load() -> Result<Self, Box<dyn Error>> {
         let path = get_config_file_path("projects.toml")?;
         if !path.exists() {
-            fs::write(&path, "[projects]\n")?;
+            return Ok(Cache {
+                projects: HashMap::new(),
+                dirty: false,
+            });
         }
-        let content = fs::read_to_string(path)?;
-        let file: ProjectsFile = toml::from_str(&content)?;
+        let content = fs::read_to_string(&path)?;
+        let file: ProjectsFile = toml::from_str(&content).map_err(|e| {
+            format!("failed to parse {}: {e}", path.display())
+        })?;
         Ok(Cache {
             projects: file.projects,
             dirty: false,
@@ -41,9 +46,6 @@ impl Cache {
             return Ok(());
         }
         let path = get_config_file_path("projects.toml")?;
-        if !path.exists() {
-            fs::write(&path, "[projects]\n")?;
-        }
         let content = toml::to_string_pretty(self)?;
         fs::write(&path, content)?;
         self.dirty = false;

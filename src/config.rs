@@ -5,8 +5,11 @@ use crate::utils::get_config_file_path;
 
 #[derive(Debug, Deserialize)]
 pub struct Cfg {
+    #[serde(default)]
     pub workspaces: Vec<String>,
+    #[serde(default)]
     pub bookmarks: Vec<String>,
+    #[serde(default)]
     pub presets: Option<HashMap<String, Preset>>,
 }
 
@@ -24,15 +27,18 @@ pub struct Preset {
 #[derive(Debug, Deserialize)]
 pub struct Window {
     pub name: Option<String>,
+    #[serde(default)]
     pub cmd: String,
 }
 
 pub fn load() -> Result<Cfg, Box<dyn Error>> {
     let path = get_config_file_path("config.toml")?;
     if !path.exists() {
-        fs::write(&path, "workspaces = []")?;
+        fs::write(&path, "workspaces = []\nbookmarks = []\n")?;
     }
-    let content = fs::read_to_string(path)?;
-    let cfg: Cfg = toml::from_str(&content)?;
+    let content = fs::read_to_string(&path)?;
+    let cfg: Cfg = toml::from_str(&content).map_err(|e| {
+        format!("failed to parse {}: {e}", path.display())
+    })?;
     Ok(cfg)
 }
