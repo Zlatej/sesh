@@ -1,4 +1,3 @@
-use clap::Subcommand;
 use std::error::Error;
 
 use clap::Parser;
@@ -15,22 +14,11 @@ mod utils;
 
 #[derive(Parser, Debug)]
 #[command(name = "sesh", about = "tmux session launcher")]
-struct Cli {
-    #[command(subcommand)]
-    command: Option<Commands>,
-}
-
-#[derive(Debug, Subcommand)]
-enum Commands {
-    Manage,
-}
+struct Cli;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let cli = Cli::parse();
-    match cli.command {
-        Some(Commands::Manage) => todo!(),
-        None => launch_project()?,
-    }
+    let _cli = Cli::parse();
+    launch_project()?;
     Ok(())
 }
 
