@@ -13,7 +13,7 @@ mod ui;
 mod utils;
 
 #[derive(Parser, Debug)]
-#[command(name = "sesh", about = "tmux session launcher")]
+#[command(name = "sesh", about = "tmux session launcher", version)]
 struct Cli;
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -35,13 +35,7 @@ fn launch_project() -> Result<(), Box<dyn Error>> {
         let preset_name = match cache.get_preset(&project.tilde) {
             Some(name) => name.to_owned(),
             None => {
-                let names: Vec<String> = cfg
-                    .presets
-                    .as_ref()
-                    .unwrap()
-                    .keys()
-                    .cloned()
-                    .collect();
+                let names: Vec<String> = cfg.presets.as_ref().unwrap().keys().cloned().collect();
                 let Some(picked) = ui::pick_preset(&names)? else {
                     return Ok(());
                 };
