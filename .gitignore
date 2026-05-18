@@ -24,3 +24,7 @@ target
 # Added by cargo
 
 /target
+
+# Second config for testing purposes
+config.toml
+.env*

@@ -32,13 +32,23 @@ pub struct Window {
 }
 
 pub fn load() -> Result<Cfg, Box<dyn Error>> {
-    let path = get_config_file_path("config.toml")?;
+    let mut path = get_config_file_path("config.toml")?;
+
+    // try using config in project root folder, only in debug builds
+    #[cfg(debug_assertions)]
+    {
+        let test_path = std::path::PathBuf::from("config.toml");
+        if test_path.exists() {
+            eprintln!("using config in project root folder");
+            path = test_path;
+        }
+    }
+
     if !path.exists() {
         fs::write(&path, "workspaces = []\nbookmarks = []\n")?;
     }
     let content = fs::read_to_string(&path)?;
-    let cfg: Cfg = toml::from_str(&content).map_err(|e| {
-        format!("failed to parse {}: {e}", path.display())
-    })?;
+    let cfg: Cfg =
+        toml::from_str(&content).map_err(|e| format!("parsing {}: {e}", path.display()))?;
     Ok(cfg)
 }
