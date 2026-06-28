@@ -1,11 +1,11 @@
 use std::{error::Error, io, os::unix::process::CommandExt, process::Command};
 
-use crate::{config::Preset, path::ProjectPath};
+use crate::{config::Window, path::ProjectPath};
 
 /// launch prepares tmux session and then attaches with exec.
 /// This function will never return or return error, it basically "exits" to tmux, meaning no
 /// destructors will be called.
-pub fn launch(project: &ProjectPath, preset: Option<&Preset>) -> Result<(), Box<dyn Error>> {
+pub fn launch(project: &ProjectPath, preset: Option<&[Window]>) -> Result<(), Box<dyn Error>> {
     let exists = Command::new("tmux")
         .args(["has-session", "-t", &project.sesh_name])
         .output()
@@ -30,11 +30,11 @@ pub fn launch(project: &ProjectPath, preset: Option<&Preset>) -> Result<(), Box<
     Err(attach_sesh(&project.sesh_name).into())
 }
 
-fn setup_windows(project: &ProjectPath, preset: &Preset) -> Result<(), Box<dyn Error>> {
+fn setup_windows(project: &ProjectPath, windows: &[Window]) -> Result<(), Box<dyn Error>> {
     let mut first = true;
     let real = project.real.display().to_string();
 
-    for w in &preset.windows {
+    for w in windows {
         if first {
             first = false;
             if let Some(win_name) = &w.name {

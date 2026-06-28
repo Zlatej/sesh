@@ -30,3 +30,6 @@ config.toml
 .env*
 tmp
 CLAUDE.md
+
+.stfolder
+.stignore

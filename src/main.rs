@@ -43,7 +43,7 @@ fn launch_project() -> Result<(), Box<dyn Error>> {
                 picked
             }
         };
-        Some(cfg.get_preset(&preset_name).ok_or("preset not found")?)
+        Some(cfg.get_preset_windows(&preset_name).ok_or("preset not found")?)
     } else {
         None
     };

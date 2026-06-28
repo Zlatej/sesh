@@ -7,7 +7,7 @@ use skim::{
 
 use crate::path::ProjectPath;
 
-pub fn pick_project(projects: &Vec<ProjectPath>) -> Result<Option<&ProjectPath>, Box<dyn Error>> {
+pub fn pick_project(projects: &[ProjectPath]) -> Result<Option<&ProjectPath>, Box<dyn Error>> {
     let display: Vec<String> = projects.iter().map(|x| x.tilde.clone()).collect();
     let Some(picked) = pick(&display, "  projects>  ")? else {
         return Ok(None);
@@ -15,7 +15,7 @@ pub fn pick_project(projects: &Vec<ProjectPath>) -> Result<Option<&ProjectPath>,
     Ok(projects.iter().find(|p| p.tilde == picked))
 }
 
-pub fn pick_preset(presets: &Vec<String>) -> Result<Option<String>, Box<dyn Error>> {
+pub fn pick_preset(presets: &[String]) -> Result<Option<String>, Box<dyn Error>> {
     pick(presets, "  preset>  ")
 }
 
