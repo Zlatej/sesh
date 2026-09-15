@@ -32,17 +32,22 @@ pub struct Window {
 }
 
 pub fn load() -> Result<Cfg, Box<dyn Error>> {
-    let mut path = get_config_file_path("config.toml")?;
-
-    // try using config in project root folder, only in debug builds
-    #[cfg(debug_assertions)]
-    {
-        let test_path = std::path::PathBuf::from("config.toml");
-        if test_path.exists() {
-            eprintln!("using config in project root folder");
-            path = test_path;
+    let path = {
+        #[cfg(not(debug_assertions))]
+        {
+            get_config_file_path("config.toml")?
         }
-    }
+        #[cfg(debug_assertions)]
+        {
+            let test_path = std::path::PathBuf::from("config.toml");
+            if test_path.exists() {
+                eprintln!("using config in project root folder");
+                test_path
+            } else {
+                get_config_file_path("config.toml")?
+            }
+        }
+    };
 
     if !path.exists() {
         fs::write(&path, "workspaces = []\nbookmarks = []\n")?;
