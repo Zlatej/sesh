@@ -32,6 +32,10 @@ impl ProjectPath {
             sesh_name,
         })
     }
+
+    pub fn target(&self) -> String {
+        format!("={}", self.sesh_name)
+    }
 }
 
 fn tmuxize_name(path: &Path) -> Result<String, Box<dyn Error>> {

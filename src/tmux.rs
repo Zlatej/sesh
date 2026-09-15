@@ -7,7 +7,7 @@ use crate::{config::Preset, path::ProjectPath};
 /// destructors will be called.
 pub fn launch(project: &ProjectPath, preset: Option<&Preset>) -> Result<(), Box<dyn Error>> {
     let exists = Command::new("tmux")
-        .args(["has-session", "-t", &project.sesh_name])
+        .args(["has-session", "-t", &project.target()])
         .output()
         .map(|o| o.status.success())
         .unwrap_or(false);
@@ -24,10 +24,10 @@ pub fn launch(project: &ProjectPath, preset: Option<&Preset>) -> Result<(), Box<
         if let Some(p) = preset {
             setup_windows(project, p)?;
         }
-        run_tmux_cmd(&["select-window", "-t", &format!("{}:^", project.sesh_name)])?;
+        run_tmux_cmd(&["select-window", "-t", &format!("{}:^", project.target())])?;
     }
 
-    Err(attach_sesh(&project.sesh_name).into())
+    Err(attach_sesh(project).into())
 }
 
 fn setup_windows(project: &ProjectPath, preset: &Preset) -> Result<(), Box<dyn Error>> {
@@ -41,12 +41,13 @@ fn setup_windows(project: &ProjectPath, preset: &Preset) -> Result<(), Box<dyn E
                 run_tmux_cmd(&[
                     "rename-window",
                     "-t",
-                    &format!("{}:", project.sesh_name),
+                    &format!("{}:", project.target()),
                     win_name,
                 ])?;
             }
         } else {
-            let mut args = vec!["new-window", "-t", &project.sesh_name, "-c", &real];
+            let target = project.target();
+            let mut args = vec!["new-window", "-t", &target, "-c", &real];
             if let Some(name) = &w.name {
                 args.extend(["-n", name.as_str()]);
             }
@@ -54,7 +55,13 @@ fn setup_windows(project: &ProjectPath, preset: &Preset) -> Result<(), Box<dyn E
         }
 
         if !w.cmd.is_empty() {
-            run_tmux_cmd(&["send-keys", "-t", &project.sesh_name, &w.cmd, "Enter"])?;
+            run_tmux_cmd(&[
+                "send-keys",
+                "-t",
+                &format!("{}:", project.target()),
+                &w.cmd,
+                "Enter",
+            ])?;
         }
     }
 
@@ -70,13 +77,15 @@ fn run_tmux_cmd(args: &[&str]) -> Result<(), Box<dyn Error>> {
     }
 }
 
-fn attach_sesh(sesh_name: &str) -> io::Error {
+fn attach_sesh(project: &ProjectPath) -> io::Error {
     let cmd = match is_in_tmux_session() {
         false => "attach-session",
         true => "switch-client",
     };
 
-    Command::new("tmux").args([cmd, "-t", sesh_name]).exec()
+    Command::new("tmux")
+        .args([cmd, "-t", &project.target()])
+        .exec()
 }
 
 fn is_in_tmux_session() -> bool {
